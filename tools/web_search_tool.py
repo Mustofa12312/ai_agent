@@ -22,11 +22,11 @@ class WebSearchTool(BaseTool):
         "Mencari informasi terbaru di internet menggunakan DuckDuckGo. "
         "Cocok untuk berita, fakta, dan konten web umum."
     )
-    parameters = {"query": "kata kunci pencRafiqn", "max_results": "jumlah hasil (default: 5)"}
+    parameters = {"query": "kata kunci pencMadura Ain", "max_results": "jumlah hasil (default: 5)"}
 
     def run(self, query: str = "", max_results: int = 5, **kwargs) -> str:
         if not query:
-            return "❌ Query pencRafiqn diperlukan."
+            return "❌ Query pencMadura Ain diperlukan."
         results = self._duckduckgo_search(query, int(max_results))
         if not results:
             results = self._bing_search(query, int(max_results))
@@ -60,7 +60,7 @@ class WebSearchTool(BaseTool):
             return []
 
     def _format_results(self, query: str, results: List[Dict]) -> str:
-        lines = [f"🔍 Hasil pencRafiqn untuk **'{query}'**:\n"]
+        lines = [f"🔍 Hasil pencMadura Ain untuk **'{query}'**:\n"]
         for i, r in enumerate(results, 1):
             lines.append(f"{i}. **{r['title']}**")
             if r.get("snippet"):

@@ -191,7 +191,7 @@ def chat(
             raise typer.Exit(1)
 
     cfg = agent.config
-    ai_name = cfg.get("ai_name", "Rafiq")
+    ai_name = cfg.get("ai_name", "Madura Ai")
     user_name = cfg.get("user_name", "Boss")
     personality = cfg.get("personality", "santai")
 
@@ -275,12 +275,12 @@ def config():
     console.print(Panel("[bold]⚙️ Konfigurasi AI Agent[/bold]", border_style="cyan"))
 
     console.print(f"\nKonfigurasi saat ini:")
-    console.print(f"  Nama AI     : [cyan]{cfg.get('ai_name', 'Rafiq')}[/cyan]")
+    console.print(f"  Nama AI     : [cyan]{cfg.get('ai_name', 'Madura Ai')}[/cyan]")
     console.print(f"  Nama User   : [green]{cfg.get('user_name', 'Boss')}[/green]")
     console.print(f"  Personality : [yellow]{cfg.get('personality', 'santai')}[/yellow]")
     console.print()
 
-    ai_name = Prompt.ask("Nama AI", default=cfg.get("ai_name", "Rafiq"))
+    ai_name = Prompt.ask("Nama AI", default=cfg.get("ai_name", "Madura Ai"))
     user_name = Prompt.ask("Nama kamu (dipanggil AI)", default=cfg.get("user_name", "Boss"))
     personality = Prompt.ask(
         "Personality [santai/formal/hacker]",
@@ -363,7 +363,7 @@ def status():
     table.add_column("Komponen", style="bold")
     table.add_column("Status")
 
-    table.add_row("Nama AI", f"[cyan]{cfg.get('ai_name', 'Rafiq')}[/cyan]")
+    table.add_row("Nama AI", f"[cyan]{cfg.get('ai_name', 'Madura Ai')}[/cyan]")
     table.add_row("User", f"[green]{cfg.get('user_name', 'Boss')}[/green]")
     table.add_row("Personality", cfg.get("personality", "santai"))
     table.add_row("Gemini API", "[green]✅ Tersedia[/green]" if gemini_ok else "[red]❌ Tidak ada key[/red]")

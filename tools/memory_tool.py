@@ -15,7 +15,7 @@ class MemoryTool(BaseTool):
         "action": "recall | store | list | search",
         "key": "(opsional) kunci/nama fakta",
         "value": "(opsional) nilai untuk disimpan (wajib saat store)",
-        "query": "(opsional) kata kunci untuk pencRafiqn",
+        "query": "(opsional) kata kunci untuk pencMadura Ain",
     }
 
     def __init__(self, memory_manager: Any = None):
@@ -65,7 +65,7 @@ class MemoryTool(BaseTool):
             return "🧠 Belum ada percakapan yang tersimpan."
         lines = ["🧠 **Percakapan terakhir:**\n"]
         for msg in history[-5:]:
-            role = "Kamu" if msg["role"] == "user" else "Rafiq"
+            role = "Kamu" if msg["role"] == "user" else "Madura Ai"
             ts = msg.get("timestamp", "")[:16]
             lines.append(f"[{ts}] **{role}**: {msg['content'][:120]}")
         return "\n".join(lines)
@@ -81,9 +81,9 @@ class MemoryTool(BaseTool):
 
     def _search(self, query: str) -> str:
         if not query:
-            return "❌ Query pencRafiqn diperlukan."
+            return "❌ Query pencMadura Ain diperlukan."
         results = self.memory.search_memory(query)
-        lines = [f"🔍 **Hasil pencRafiqn memori: '{query}'**\n"]
+        lines = [f"🔍 **Hasil pencMadura Ain memori: '{query}'**\n"]
         facts = results.get("facts", [])
         convos = results.get("conversations", [])
         if facts:

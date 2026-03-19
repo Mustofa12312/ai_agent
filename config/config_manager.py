@@ -28,7 +28,7 @@ def get_system_prompt(cfg: dict) -> str:
     persona_key = cfg.get("personality", "santai")
     personalities = cfg.get("personalities", {})
     base = personalities.get(persona_key, "Kamu adalah AI assistant yang helpful.")
-    ai_name = cfg.get("ai_name", "Rafiq")
+    ai_name = cfg.get("ai_name", "Madura Ai")
     user_name = cfg.get("user_name", "Boss")
     prompt = base.replace("{user_name}", user_name)
     prompt = f"Namamu adalah {ai_name}. " + prompt
@@ -37,7 +37,7 @@ def get_system_prompt(cfg: dict) -> str:
 
 def _default_config() -> dict:
     return {
-        "ai_name": "Rafiq",
+        "ai_name": "Madura Ai",
         "user_name": "Boss",
         "personality": "santai",
         "language": "id",
