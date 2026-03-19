@@ -11,16 +11,19 @@ load_dotenv()
 
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
+GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
 
 
 class LLMWrapper:
-    """Wraps Gemini API with OpenAI fallback."""
+    """Wraps Gemini API with Groq/OpenAI fallback."""
 
     def __init__(self):
         self._gemini_model = None
-        self._openai_client = None
+        self._fallback_client = None
+        self._fallback_model = None
+        self._fallback_name = None
         self._init_gemini()
-        self._init_openai()
+        self._init_fallback()
 
     def _init_gemini(self) -> None:
         if not GEMINI_API_KEY:
@@ -40,15 +43,23 @@ class LLMWrapper:
             from utils.logger import log_error
             log_error("LLM._init_gemini", e)
 
-    def _init_openai(self) -> None:
-        if not OPENAI_API_KEY:
-            return
+    def _init_fallback(self) -> None:
         try:
             from openai import OpenAI
-            self._openai_client = OpenAI(api_key=OPENAI_API_KEY)
+            if GROQ_API_KEY:
+                self._fallback_client = OpenAI(
+                    api_key=GROQ_API_KEY, 
+                    base_url="https://api.groq.com/openai/v1"
+                )
+                self._fallback_model = "llama-3.3-70b-versatile"
+                self._fallback_name = "Groq (Llama 3)"
+            elif OPENAI_API_KEY:
+                self._fallback_client = OpenAI(api_key=OPENAI_API_KEY)
+                self._fallback_model = "gpt-3.5-turbo"
+                self._fallback_name = "OpenAI"
         except Exception as e:
             from utils.logger import log_error
-            log_error("LLM._init_openai", e)
+            log_error("LLM._init_fallback", e)
 
     def chat(
         self,
@@ -62,14 +73,14 @@ class LLMWrapper:
         except Exception as gemini_err:
             from utils.logger import log_error, logger
             log_error("Gemini", gemini_err)
-            if self._openai_client:
-                logger.warning("⚠️ Gemini gagal, mencoba OpenAI fallback...")
+            if self._fallback_client:
+                logger.warning(f"⚠️ Gemini gagal (Limit 429), otomatis memakai {self._fallback_name}...")
             try:
-                return self._openai_chat(messages, system_prompt)
-            except Exception as openai_err:
-                if str(openai_err) == "OPENAI_API_KEY tidak dikonfigurasi. Abaikan fallback.":
-                    return "❌ Maaf, saya sedang sangat lelah (Batas penggunaan Gemini habis sementara waktu 429). Mohon tunggu sekitar 1-2 menit lalu coba sapa lagi ya! 🥺"
-                log_error("OpenAI", openai_err)
+                return self._fallback_chat(messages, system_prompt)
+            except Exception as fallback_err:
+                if str(fallback_err) == "NO_FALLBACK_KEY":
+                    return "❌ Maaf, saya sedang sangat lelah (Batas penggunaan harian Gemini habis). **Saran:** Tambahkan `GROQ_API_KEY` di file `.env` supaya saya bisa otomatis memakai Llama-3 gratis saat ini terjadi!"
+                log_error("Fallback", fallback_err)
                 return "❌ Maaf, terjadi kesalahan pada sistem AI. Coba lagi sebentar."
 
     def _gemini_chat(
@@ -80,17 +91,15 @@ class LLMWrapper:
     ) -> str:
         import google.generativeai as genai
 
-        # Build history in Gemini format
         history = []
         system_parts = [system_prompt] if system_prompt else []
 
-        for msg in messages[:-1]:  # All except the last user message
+        for msg in messages[:-1]:
             role = "user" if msg["role"] == "user" else "model"
             history.append({"role": role, "parts": [msg["content"]]})
 
         last_user_msg = messages[-1]["content"] if messages else ""
 
-        # Include tool context in system
         if tool_schemas:
             tool_desc = "\n\nAva tools yang bisa kamu panggil:\n"
             for t in tool_schemas:
@@ -111,20 +120,20 @@ class LLMWrapper:
         response = chat.send_message(last_user_msg)
         return response.text.strip()
 
-    def _openai_chat(
+    def _fallback_chat(
         self,
         messages: List[Dict[str, str]],
         system_prompt: str,
     ) -> str:
-        if not self._openai_client:
-            raise ValueError("OPENAI_API_KEY tidak dikonfigurasi. Abaikan fallback.")
+        if not self._fallback_client:
+            raise ValueError("NO_FALLBACK_KEY")
         all_messages = []
         if system_prompt:
             all_messages.append({"role": "system", "content": system_prompt})
         all_messages.extend(messages)
 
-        response = self._openai_client.chat.completions.create(
-            model="gpt-3.5-turbo",
+        response = self._fallback_client.chat.completions.create(
+            model=self._fallback_model,
             messages=all_messages,
             max_tokens=1024,
             temperature=0.7,
@@ -137,8 +146,8 @@ class LLMWrapper:
         system_prompt: str = "",
         tool_schemas: Optional[List[Dict]] = None,
     ) -> str:
-        """Async wrapper around the synchronous chat."""
         return await asyncio.to_thread(self.chat, messages, system_prompt, tool_schemas)
 
     def is_available(self) -> bool:
-        return self._gemini_model is not None or self._openai_client is not None
+        return self._gemini_model is not None or self._fallback_client is not None
+

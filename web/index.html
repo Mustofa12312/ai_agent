@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, interactive-widget=resizes-content">
+    <title>Madura Ai - Web Workspace</title>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Fira+Code&display=swap" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Marked JS for Markdown -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Kiri -->
+        <aside class="sidebar">
+            <div class="logo">
+                <i class="fa-solid fa-robot glowing-icon"></i>
+                <h2>Madura Ai</h2>
+            </div>
+            <nav class="nav-menu">
+                <a href="#" class="active"><i class="fa-solid fa-messages"></i> Obrolan</a>
+                <a href="#" onclick="alert('Fitur file manager UI sedang dikembangkan!')"><i class="fa-solid fa-folder-tree"></i> Workspace</a>
+                <a href="#" id="settings-btn"><i class="fa-solid fa-sliders"></i> Pengaturan</a>
+            </nav>
+            <div class="system-status">
+                <div class="status-indicator">
+                    <span class="status-dot"></span>
+                    <span>Sistem Aktif (Local)</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Area Obrolan Utama -->
+        <main class="chat-container">
+            <header class="top-bar">
+                <div class="agent-info">
+                    <h3>Madura Ai</h3>
+                    <p>Siap membantu pekerjaan Anda ✨</p>
+                </div>
+                <div class="actions">
+                    <button class="icon-btn" id="clear-btn" title="Hapus Riwayat di Layar"><i class="fa-solid fa-trash-can"></i></button>
+                    <button class="icon-btn" id="theme-toggle" title="Ganti Tema"><i class="fa-solid fa-moon"></i></button>
+                </div>
+            </header>
+
+            <div class="chat-history" id="chat-history">
+                <div class="message ai-message">
+                    <div class="avatar"><i class="fa-solid fa-robot"></i></div>
+                    <div class="content">
+                        <p>Halo, Boss! Saya **Madura AI**, AI Agent lokal Anda. Apa yang ingin kita kerjakan hari ini?</p>
+                        <p><em>Cobalah menyuruh saya mencari berita, mengecek cuaca, membuat daftar catatan, atau apapun!</em></p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="input-area">
+                <form id="chat-form">
+                    <div class="input-wrapper">
+                        <textarea id="message-input" placeholder="Tulis instruksi atau pesan untuk Madura AI..." rows="1"></textarea>
+                        <button type="submit" id="send-btn"><i class="fa-solid fa-paper-plane"></i></button>
+                    </div>
+                    <div class="input-footer">
+                        Tekan <strong>Enter</strong> untuk kirim, <strong>Shift + Enter</strong> untuk baris baru.
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>
+    
+    <!-- Settings Modal -->
+    <div id="settings-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            <h2>Pengaturan AI Agent</h2>
+            <form id="settings-form">
+                <div class="form-group">
+                    <label>Nama AI:</label>
+                    <input type="text" id="ai-name-input" required>
+                </div>
+                <div class="form-group">
+                    <label>Nama Anda:</label>
+                    <input type="text" id="user-name-input" required>
+                </div>
+                <div class="form-group">
+                    <label>Personality:</label>
+                    <select id="personality-input">
+                        <option value="santai">Santai</option>
+                        <option value="formal">Formal</option>
+                        <option value="hacker">Hacker</option>
+                    </select>
+                </div>
+                <button type="submit" class="save-btn">Simpan</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>

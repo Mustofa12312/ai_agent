@@ -358,6 +358,9 @@ def status():
 
     gemini_ok = bool(os.getenv("GEMINI_API_KEY"))
     openai_ok = bool(os.getenv("OPENAI_API_KEY"))
+    groq_ok = bool(os.getenv("GROQ_API_KEY"))
+    serpapi_ok = bool(os.getenv("SERPAPI_KEY"))
+    openweather_ok = bool(os.getenv("OPENWEATHER_API_KEY"))
 
     table = Table(title="📊 Status AI Agent", box=box.ROUNDED, border_style="cyan")
     table.add_column("Komponen", style="bold")
@@ -368,10 +371,45 @@ def status():
     table.add_row("Personality", cfg.get("personality", "santai"))
     table.add_row("Gemini API", "[green]✅ Tersedia[/green]" if gemini_ok else "[red]❌ Tidak ada key[/red]")
     table.add_row("OpenAI API", "[green]✅ Tersedia[/green]" if openai_ok else "[yellow]⚠️ Tidak dikonfigurasi[/yellow]")
+    table.add_row("Groq API", "[green]✅ Tersedia[/green]" if groq_ok else "[yellow]⚠️ Tidak dikonfigurasi[/yellow]")
+    table.add_row("SerpAPI", "[green]✅ Tersedia[/green]" if serpapi_ok else "[yellow]⚠️ Tidak dikonfigurasi[/yellow]")
+    table.add_row("OpenWeather API", "[green]✅ Tersedia[/green]" if openweather_ok else "[yellow]⚠️ Tidak dikonfigurasi[/yellow]")
     table.add_row("Fakta tersimpan", str(len(facts)))
     table.add_row("Percakapan terakhir", recent[0]["timestamp"][:16] if recent else "Belum ada")
 
     console.print(table)
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+#  Web UI command
+# ─────────────────────────────────────────────────────────────────────────────
+
+@app.command()
+def web(port: int = typer.Option(8000, "--port", "-p", help="Port untuk Web UI")):
+    """🌐 Jalankan AI Agent dalam mode Web Browser (Visual UI lokal)."""
+    import uvicorn
+    import socket
+    
+    # Deteksi IP lokal jaringan WiFi
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    try:
+        s.connect(('10.255.255.255', 1))
+        local_ip = s.getsockname()[0]
+    except Exception:
+        local_ip = '127.0.0.1'
+    finally:
+        s.close()
+        
+    console.print(f"[bold green]🚀 Menyiapkan Web Server...[/bold green]")
+    console.print(f"👉 Akses di [yellow]Laptop Anda[/yellow]: [link=http://localhost:{port}/]http://localhost:{port}/[/link]")
+    if local_ip != '127.0.0.1':
+        console.print(f"👉 Akses di [yellow]HP Anda (WiFi yang sama)[/yellow]: [link=http://{local_ip}:{port}/]http://{local_ip}:{port}/[/link]")
+        
+    try:
+        # Ubah host dari 127.0.0.1 menjadi 0.0.0.0 agar port terbuka ke WiFi
+        uvicorn.run("web_server:app", host="0.0.0.0", port=port, reload=True)
+    except KeyboardInterrupt:
+        console.print("\n[dim]Server dimatikan. Bye! 👋[/dim]")
 
 
 # ─────────────────────────────────────────────────────────────────────────────
